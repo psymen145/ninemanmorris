@@ -7,17 +7,22 @@
 
 using namespace std;
 
-
 int main() {
 	int CurrentPlayer;
 	srand(time(NULL));  //so rand() will generate random number
 	int token = -1;  //used to hold player's token choice
 	int moveToPosition = -1;
 	int flag = 0;   //1 if the player can go again
+	char humanOrAI;
 
 	NineManMorris NineManGame;
 
-	cout << "NINE MAN MORRIS" << endl;
+	cout << "NINE MAN MORRIS\n--------------------------------" << endl;
+
+	//ask user if they want to play with human or AI
+	cout << "HUMAN VS HUMAN (Press 'h')\nHUMAN VS AI (Press 'a')" << endl;
+	cin >> humanOrAI;
+
 	NineManGame.display();
 
 	//determine which player goes first
@@ -119,6 +124,13 @@ int main() {
 		}
 	}
 
+	cout << "\n----------GAME OVER----------" << endl;
+	if (CurrentPlayer == 1) {	//player 2 has won and not player 1 because we switched players at the end of the while loop
+		cout << "\t\tPlayer 2 has won!" << endl;
+	}
+	else {
+		cout << "\t\tPlayer 1 has won!" << endl;
+	}
 	//1 is human 2 is AI
 
 	//Random number generator to determine who comes first
