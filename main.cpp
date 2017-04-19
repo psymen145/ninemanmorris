@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "board.h"
 #include "nineman.h"
 #include <stdlib.h>
