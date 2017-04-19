@@ -1,28 +1,37 @@
-#include "board.h"
+#include "stdafx.h"
+#include "Board.h"
+#include <algorithm>
 #include <iostream>
 
-board::board() {
+using namespace std;
 
-	for (int i = 0; i < 24; i++) {
-		gameboard[i] = 0;
+Board::Board(int arr[]) {
+
+	if (arr == NULL) {
+		for (int i = 0; i < 24; i++) {
+			gameboard[i] = 0;
+		}
+	}
+	else {
+		copy(arr, arr + 24, gameboard);
 	}
 
 }
 
-int board::getBoard(int position) {
+int Board::getBoard(int position) {
 
 	return gameboard[position];
 
 }
 
-void board::setBoard(int location, int player) {
+void Board::setBoard(int location, int player) {
 
 	gameboard[location] = player;
 
 }
 
 
-bool board::adjacentPositions(int token, int position) {
+bool Board::adjacentPositions(int token, int position) {
 
 	//given the following token, the valid positions are:
 	if (token == 0) {
@@ -221,7 +230,7 @@ bool board::adjacentPositions(int token, int position) {
 	return false;
 }
 
-void board::displayBoard() {
+void Board::displayBoard() {
 
 	for (int i = 0; i < 24; i++) {
 
@@ -287,8 +296,43 @@ void board::displayBoard() {
 			cout << gameboard[i] << endl;
 		}
 	}
-
 }
 
+int Board::evaluateBoard(int maximizingPlayer, int phase) {
+	
+	if(phase == 1) {
+		return 18 * (1) + 26 * (2) + 1 * (3) + 9 * (4) + 10 * (5) + 7 * (6);
+	}
+	else if (phase == 2) {
+		return 14 * (1) + 43 * (2) + 10 * (3) + 11 * (4) + 8 * (7) + 1086 * (8);
+	}
+	else if (phase == 3) {
+		return 16 * (1) + 10 * (5) + 1 * (6) + 1190 * (8);
+	}
+}
 
+vector<Board> Board::generateBoard(bool maximizingPlayer, int phase) {
+	//temp vector used to store boards as we generate them
+	vector<Board> temp_vec;
 
+	//different possible boards for each, we assuming maximizing player is player 1
+	if (maximizingPlayer) {
+		if (phase == 1) {	//phase 1
+			for (int i = 0; i < 24; i++) {
+				if(gameboard[i] == 0) {		//find the open spot and put the maximizingplayer's token on it
+					Board newBoard(gameboard);		//used to create new object to put into vector
+					newBoard.setBoard(i,1);			//change the location where we found the empty spot and put the player's token
+					temp_vec.push_back(newBoard);	//add this instance to the vector
+				}
+			}
+		}
+		else if (phase == 2) {	//phase 2
+
+		}
+		else {	//phase 3
+				
+		}
+
+		return temp_vec;
+	}
+}
