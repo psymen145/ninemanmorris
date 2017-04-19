@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef nineman_h
 #define nineman_h
 #include "board.h"
@@ -11,35 +13,22 @@ class NineManMorris {
 public:
 
 	NineManMorris();
-	void display();
-
-	//determine if there is a winner
-	bool isGameOver();
-
-	void play(int player, int token, int MoveTo);
-
-	bool isValid(int player, int token, int position);
-
+	void display();		//same as board class display, used so main can call it
+	bool isGameOver();	//return true if there's a winner
+	void play(int player, int token, int MoveTo);	//finalizes the move onto the board
+	bool isValid(int player, int token, int position);	//returns true if move is suffices all conditions
 	int getPhase();
 	void setPhase(int p);
-
-	//getter/setter for number of tokens for player 1
-	int getNumTokensP1();
-
-	//getter/setter for number of tokens for player 2
-	int getNumTokensP2();
-
-	//check if move made three
-	void checkTriple(int currentplayer, int spot);
-
-	//checks how many tokens are placed on the board
-	int getTokensPlaced(int player);
+	int getNumTokensP1();	//return the number of tokens in hand of P1
+	int getNumTokensP2();	//return the number of tokens in hand of P2
+	void checkTriple(int currentplayer, int spot);	//check if a three in a row 
+	int getTokensPlaced(int player);	//returns how many tokens are placed on the board by parameter
 
 	//alphabeta prunning for the AI
-	//int alphabeta(GameState node, int depth, int alpha, int beta, bool maximizingPlayer);
+	int alphabeta(Board node, int depth, int alpha, int beta, bool maximizingPlayer);
 
 private:
-	board Game;
+	Board board;
 	int phase;  //determines if its placing stage, moving stage or flying stage
 	int numOfTokensInHandP1;
 	int numOfTokensInHandP2;
