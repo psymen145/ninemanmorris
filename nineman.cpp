@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "nineman.h"
 #include <iostream>
 
@@ -10,7 +10,7 @@ NineManMorris::NineManMorris() :phase(1), numOfTokensInHandP1(9), numOfTokensInH
 
 void NineManMorris::display() {
 
-	Game.displayBoard();
+	board.displayBoard();
 
 }
 
@@ -19,11 +19,9 @@ bool NineManMorris::isGameOver() {
 	//check if game is over by seeing if theres less than 3 pieces on the board
 	//it also has to be in phase 3, or else this will read as game over in phase 1
 	if (getTokensPlaced(1) < 3 && phase == 3) {
-		cout << "\n-----------player 2 has won!----------" << endl;
 		return true;
 	}
 	else if (getTokensPlaced(2) < 3 && phase == 3) {
-		cout << "\n-----------player 1 has won!----------" << endl;
 		return true;
 	}
 
@@ -38,7 +36,7 @@ void NineManMorris::play(int player, int token, int MoveTo) {
 
 	//placing stage
 	if (phase == 1) {
-		Game.setBoard(MoveTo, player);
+		board.setBoard(MoveTo, player);
 		if (player == 1) {
 			numOfTokensInHandP1--;
 		}
@@ -49,15 +47,15 @@ void NineManMorris::play(int player, int token, int MoveTo) {
 	//moving phase
 	else if (phase == 2) {
 		//change the spot where the player wants to move to
-		Game.setBoard(MoveTo, player);
+		board.setBoard(MoveTo, player);
 		//remove the spot where the player's token originally was. This gives the image that the token is moving
-		Game.setBoard(token, 0);
+		board.setBoard(token, 0);
 	}
 	else if (phase == 3) {
 		//change the spot where the player wants to move to
-		Game.setBoard(MoveTo, player);
+		board.setBoard(MoveTo, player);
 		//remove the spot where the player's token originally was. This gives the image that the token is moving
-		Game.setBoard(token, 0);
+		board.setBoard(token, 0);
 	}
 }
 
@@ -65,7 +63,7 @@ void NineManMorris::play(int player, int token, int MoveTo) {
 bool NineManMorris::isValid(int player, int token, int position) {
 
 	//regardless of phase, the position that the token wants to go to has to be empty
-	if (Game.getBoard(position) != 0) {
+	if (board.getBoard(position) != 0) {
 		return false;
 	}
 	//phase 1 set of rules:
@@ -90,20 +88,20 @@ bool NineManMorris::isValid(int player, int token, int position) {
 	//2. the spot they want to go to must be adjacent
 	else if (phase == 2) {
 		if (player == 1) {
-			if (Game.getBoard(token) != 1) {
+			if (board.getBoard(token) != 1) {
 				return false;
 			}
 			else {
 				//returns true or false
-				return Game.adjacentPositions(token, position);
+				return board.adjacentPositions(token, position);
 			}
 		}
 		else {		//player 2
-			if (Game.getBoard(token) != 2) {
+			if (board.getBoard(token) != 2) {
 				return false;
 			}
 			else {
-				return Game.adjacentPositions(token, position);
+				return board.adjacentPositions(token, position);
 			}
 		}
 	}
@@ -112,12 +110,12 @@ bool NineManMorris::isValid(int player, int token, int position) {
 	//1. the spot they choose to get the token from has to be their token
 	else if (phase == 3) {
 		if (player == 1) {    //if player 1, we have to check the token they want to move is actually their token
-			if (Game.getBoard(token) == 1) {
+			if (board.getBoard(token) == 1) {
 				return true;
 			}
 		}
 		if (player == 2) {    //same as player 1
-			if (Game.getBoard(token) == 2) {
+			if (board.getBoard(token) == 2) {
 				return true;
 			}
 		}
@@ -154,145 +152,145 @@ void NineManMorris::checkTriple(int currentplayer, int spot) {
 	//given a spot, see if the two possible lines (horizontal/vertical) have 3 in a row
 	if (spot == 0) {
 
-		if ((Game.getBoard(1) == currentplayer && Game.getBoard(2) == currentplayer) || (Game.getBoard(9) == currentplayer && Game.getBoard(21) == currentplayer)) {
+		if ((board.getBoard(1) == currentplayer && board.getBoard(2) == currentplayer) || (board.getBoard(9) == currentplayer && board.getBoard(21) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 1) {
 
-		if ((Game.getBoard(0) == currentplayer && Game.getBoard(2) == currentplayer) || (Game.getBoard(4) == currentplayer && Game.getBoard(7) == currentplayer)) {
+		if ((board.getBoard(0) == currentplayer && board.getBoard(2) == currentplayer) || (board.getBoard(4) == currentplayer && board.getBoard(7) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 2) {
 
-		if ((Game.getBoard(0) == currentplayer && Game.getBoard(1) == currentplayer) || (Game.getBoard(23) == currentplayer && Game.getBoard(14) == currentplayer)) {
+		if ((board.getBoard(0) == currentplayer && board.getBoard(1) == currentplayer) || (board.getBoard(23) == currentplayer && board.getBoard(14) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 3) {
 
-		if ((Game.getBoard(4) == currentplayer && Game.getBoard(5) == currentplayer) || (Game.getBoard(10) == currentplayer && Game.getBoard(18) == currentplayer)) {
+		if ((board.getBoard(4) == currentplayer && board.getBoard(5) == currentplayer) || (board.getBoard(10) == currentplayer && board.getBoard(18) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 4) {
 
-		if ((Game.getBoard(3) == currentplayer && Game.getBoard(5) == currentplayer) || (Game.getBoard(2) == currentplayer && Game.getBoard(7) == currentplayer)) {
+		if ((board.getBoard(3) == currentplayer && board.getBoard(5) == currentplayer) || (board.getBoard(2) == currentplayer && board.getBoard(7) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 5) {
 
-		if ((Game.getBoard(3) == currentplayer && Game.getBoard(4) == currentplayer) || (Game.getBoard(13) == currentplayer && Game.getBoard(20) == currentplayer)) {
+		if ((board.getBoard(3) == currentplayer && board.getBoard(4) == currentplayer) || (board.getBoard(13) == currentplayer && board.getBoard(20) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 6) {
 
-		if ((Game.getBoard(7) == currentplayer && Game.getBoard(8) == currentplayer) || (Game.getBoard(11) == currentplayer && Game.getBoard(15) == currentplayer)) {
+		if ((board.getBoard(7) == currentplayer && board.getBoard(8) == currentplayer) || (board.getBoard(11) == currentplayer && board.getBoard(15) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 7) {
 
-		if ((Game.getBoard(6) == currentplayer && Game.getBoard(8) == currentplayer) || (Game.getBoard(1) == currentplayer && Game.getBoard(4) == currentplayer)) {
+		if ((board.getBoard(6) == currentplayer && board.getBoard(8) == currentplayer) || (board.getBoard(1) == currentplayer && board.getBoard(4) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 8) {
 
-		if ((Game.getBoard(6) == currentplayer && Game.getBoard(7) == currentplayer) || (Game.getBoard(12) == currentplayer && Game.getBoard(16) == currentplayer)) {
+		if ((board.getBoard(6) == currentplayer && board.getBoard(7) == currentplayer) || (board.getBoard(12) == currentplayer && board.getBoard(16) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 9) {
 
-		if ((Game.getBoard(10) == currentplayer && Game.getBoard(11) == currentplayer) || (Game.getBoard(0) == currentplayer && Game.getBoard(21) == currentplayer)) {
+		if ((board.getBoard(10) == currentplayer && board.getBoard(11) == currentplayer) || (board.getBoard(0) == currentplayer && board.getBoard(21) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 10) {
 
-		if ((Game.getBoard(9) == currentplayer && Game.getBoard(11) == currentplayer) || (Game.getBoard(3) == currentplayer && Game.getBoard(18) == currentplayer)) {
+		if ((board.getBoard(9) == currentplayer && board.getBoard(11) == currentplayer) || (board.getBoard(3) == currentplayer && board.getBoard(18) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 11) {
 
-		if ((Game.getBoard(15) == currentplayer && Game.getBoard(6) == currentplayer) || (Game.getBoard(9) == currentplayer && Game.getBoard(10) == currentplayer)) {
+		if ((board.getBoard(15) == currentplayer && board.getBoard(6) == currentplayer) || (board.getBoard(9) == currentplayer && board.getBoard(10) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 12) {
 
-		if ((Game.getBoard(13) == currentplayer && Game.getBoard(14) == currentplayer) || (Game.getBoard(8) == currentplayer && Game.getBoard(17) == currentplayer)) {
+		if ((board.getBoard(13) == currentplayer && board.getBoard(14) == currentplayer) || (board.getBoard(8) == currentplayer && board.getBoard(17) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 13) {
 
-		if ((Game.getBoard(12) == currentplayer && Game.getBoard(14) == currentplayer) || (Game.getBoard(20) == currentplayer && Game.getBoard(5) == currentplayer)) {
+		if ((board.getBoard(12) == currentplayer && board.getBoard(14) == currentplayer) || (board.getBoard(20) == currentplayer && board.getBoard(5) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 14) {
 
-		if ((Game.getBoard(12) == currentplayer && Game.getBoard(13) == currentplayer) || (Game.getBoard(2) == currentplayer && Game.getBoard(23) == currentplayer)) {
+		if ((board.getBoard(12) == currentplayer && board.getBoard(13) == currentplayer) || (board.getBoard(2) == currentplayer && board.getBoard(23) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 15) {
 
-		if ((Game.getBoard(6) == currentplayer && Game.getBoard(11) == currentplayer) || (Game.getBoard(16) == currentplayer && Game.getBoard(17) == currentplayer)) {
+		if ((board.getBoard(6) == currentplayer && board.getBoard(11) == currentplayer) || (board.getBoard(16) == currentplayer && board.getBoard(17) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 16) {
 
-		if ((Game.getBoard(15) == currentplayer && Game.getBoard(17) == currentplayer) || (Game.getBoard(19) == currentplayer && Game.getBoard(22) == currentplayer)) {
+		if ((board.getBoard(15) == currentplayer && board.getBoard(17) == currentplayer) || (board.getBoard(19) == currentplayer && board.getBoard(22) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 17) {
 
-		if ((Game.getBoard(15) == currentplayer && Game.getBoard(16) == currentplayer) || (Game.getBoard(8) == currentplayer && Game.getBoard(12) == currentplayer)) {
+		if ((board.getBoard(15) == currentplayer && board.getBoard(16) == currentplayer) || (board.getBoard(8) == currentplayer && board.getBoard(12) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 18) {
 
-		if ((Game.getBoard(3) == currentplayer && Game.getBoard(10) == currentplayer) || (Game.getBoard(19) == currentplayer && Game.getBoard(20) == currentplayer)) {
+		if ((board.getBoard(3) == currentplayer && board.getBoard(10) == currentplayer) || (board.getBoard(19) == currentplayer && board.getBoard(20) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 19) {
 
-		if ((Game.getBoard(18) == currentplayer && Game.getBoard(20) == currentplayer) || (Game.getBoard(22) == currentplayer && Game.getBoard(16) == currentplayer)) {
+		if ((board.getBoard(18) == currentplayer && board.getBoard(20) == currentplayer) || (board.getBoard(22) == currentplayer && board.getBoard(16) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 20) {
 
-		if ((Game.getBoard(18) == currentplayer && Game.getBoard(19) == currentplayer) || (Game.getBoard(5) == currentplayer && Game.getBoard(12) == currentplayer)) {
+		if ((board.getBoard(18) == currentplayer && board.getBoard(19) == currentplayer) || (board.getBoard(5) == currentplayer && board.getBoard(12) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 21) {
 
-		if ((Game.getBoard(0) == currentplayer && Game.getBoard(9) == currentplayer) || (Game.getBoard(22) == currentplayer && Game.getBoard(23) == currentplayer)) {
+		if ((board.getBoard(0) == currentplayer && board.getBoard(9) == currentplayer) || (board.getBoard(22) == currentplayer && board.getBoard(23) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 22) {
 
-		if ((Game.getBoard(21) == currentplayer && Game.getBoard(23) == currentplayer) || (Game.getBoard(16) == currentplayer && Game.getBoard(19) == currentplayer)) {
+		if ((board.getBoard(21) == currentplayer && board.getBoard(23) == currentplayer) || (board.getBoard(16) == currentplayer && board.getBoard(19) == currentplayer)) {
 			flag = 1;
 		}
 	}
 	else if (spot == 23) {
 
-		if ((Game.getBoard(2) == currentplayer && Game.getBoard(14) == currentplayer) || (Game.getBoard(22) == currentplayer && Game.getBoard(21) == currentplayer)) {
+		if ((board.getBoard(2) == currentplayer && board.getBoard(14) == currentplayer) || (board.getBoard(22) == currentplayer && board.getBoard(21) == currentplayer)) {
 			flag = 1;
 		}
 	}
@@ -305,14 +303,14 @@ void NineManMorris::checkTriple(int currentplayer, int spot) {
 
 			//check if the selected position has a token
 			if (currentplayer == 1) {
-				if (Game.getBoard(desiredRemove) == 2) {
-					Game.setBoard(desiredRemove, 0);
+				if (board.getBoard(desiredRemove) == 2) {
+					board.setBoard(desiredRemove, 0);
 					flag = 0;   //flag is 0, so we know a valid token is chosen to be removed
 				}
 			}
 			else if (currentplayer == 2) {
-				if (Game.getBoard(desiredRemove) == 1) {
-					Game.setBoard(desiredRemove, 0);
+				if (board.getBoard(desiredRemove) == 1) {
+					board.setBoard(desiredRemove, 0);
 					flag = 0;
 				}
 			}
@@ -325,7 +323,7 @@ int NineManMorris::getTokensPlaced(int player) {
 	int counter = 0;
 
 	for (int i = 0; i < 24; i++) {
-		if (Game.getBoard(i) == player) {
+		if (board.getBoard(i) == player) {
 			counter++;
 		}
 	}
@@ -333,45 +331,50 @@ int NineManMorris::getTokensPlaced(int player) {
 	return counter;
 }
 
-/*int NineManMorris::alphabeta(GameState node, int depth, int alpha, int beta, bool maximizingPlayer) {
-//v will be the value passed up the tree
-int v;
+/*int NineManMorris::alphabeta(Board node, int depth, int alpha, int beta, bool maximizingPlayer) {
+	//v will be the value passed up the tree
+	int v;
 
-//check if terminal node by:
-//1. No more possible moves (e.g. phase 2 and all nodes are stuck, phase 1 no more pl
-//2.
-if (depth == 0 || node is a terminal node) {
-//return the heuristic value of node, this will generate the v value for the bottom node
-evaluateBoard();
-}
-if (maximizingPlayer) {
-v = -infinity;
+	//check if a player won in the given board node
+	if (isGameOver) {
+		return node.evaluateBoard(maximizingPlayer,getPhase());
+	}
 
-//generate child nodes
-vector<GameState> PossibleStates = generateStates();
+	//check if last node in branch
+	if (depth == 0) {
+		//return the heuristic value of node, this will generate the v value for the bottom node
+		return node.evaluateBoard(phase);
+	}
 
-//for each child node
-for(int i = 0; i < PossibleStates.size; i++){
-v = max(v, alphabeta(PossibleStates.at(i), depth - 1, alpha, beta, false));
-alpha = max(alpha, v);
-if (beta <= alpha)
-break;		//beta cut - off
-}
-return v;
-}
-else {
-v = infinity;
+	if (maximizingPlayer) {
+		v = INT_MIN;
+		
+		//generate all children
+		vector<Board> possibleBoards = node.generateBoard();
 
-//generate child nodes
-vector<GameState> PossibleStates = generateStates();
+		for(int i = 0; i < possibleBoards.size(); i++){
+			//see which child is the best choice
+			v = max(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, false));
+			alpha = max(alpha, v);
+			if (beta <= alpha) {
+				break;		//beta cut - off
+			}
+		}
+		return v;
+	}
+	else {
+		v = INT_MAX;
 
-for (int i = 0; i < PossibleStates.size; i++) {
-v = min(v, alphabeta(PossibleStates.at(i), depth - 1, alpha, beta, true));
-beta = min(beta, v);
-if (beta <= alpha) {
-break;		//alpha cut - off
-}
-}
-return v;
-}
+		//generate child nodes
+		vector<Board> possibleBoards = node.generateBoard();
+
+		for (int i = 0; i < possibleBoards.size; i++) {
+			v = min(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, true));
+			beta = min(beta, v);
+			if (beta <= alpha) {
+				break;		//alpha cut - off
+			}
+		}
+		return v;
+	}
 }*/
