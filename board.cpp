@@ -1,525 +1,383 @@
-#include "stdafx.h"
 #include "Board.h"
 #include <algorithm>
 #include <iostream>
 
 using namespace std;
 
-Board::Board(Node board[24]) {
+Board::Board():positionLastPlacedP1(-1), positionLastPlacedP2(-1){
+    
+    for (int i = 0; i < 24; i++) {	//make 24 positions on the board
+        gamePositions[i] = Node(0, i, 0);
+    }
+}
 
-	if (board == NULL) {
-		for (int i = 0; i < 24; i++) {	//make 24 positions on the board
-			gamePositions[i] = Node(0, i, 0);
-		}
-	}
-	else {
-		for (int i = 0; i < 24; i++) {
-			//copy over the board passed in as a parameter, over the private gameboard object
-			gamePositions[i] = Node(board[i].getIsOccupied(), board[i].getPosition(), board[i].getPlayerOccupy());
-		}
-	}
-
+Board::Board(map<int,Node> board, int lastPosP1, int lastPosP2) {
+    
+    for(int i = 0; i < 24; i++){
+        gamePositions[i] = Node(board[i].getIsOccupied(), board[i].getPosition(), board[i].getPlayerOccupy());
+        //once a board is passed in, we need to also copy the tokenRemove, positionLastPlaced
+        positionLastPlacedP1 = lastPosP1;
+        positionLastPlacedP2 = lastPosP2;
+    }
 }
 
 int Board::getBoard(int position) {
-
-	for (int i = 0; i < 24; i++) {
-		if (gamePositions[i].getPosition() == position) {
-			return gamePositions[i].getPlayerOccupy();
-		}
-	}
-
-	return -1;
+    
+    return gamePositions[position].getPlayerOccupy();
 }
 
 void Board::setBoard(int location, int player) {
-
-	for (int i = 0; i < 24; i++) {
-		if (gamePositions[i].getPosition() == location) {
-			if (player == 0) {		//check if its a removal of a token
-				gamePositions[i].setIsOccupied(false);
-				gamePositions[i].setPlayerOccupy(player);
-			}
-			else if (player == 1) {
-				gamePositions[i].setIsOccupied(true);
-				gamePositions[i].setPlayerOccupy(player);
-				positionLastPlacedP1 = location;
-			}
-			else {
-				gamePositions[i].setIsOccupied(true);
-				gamePositions[i].setPlayerOccupy(player);
-				positionLastPlacedP2 = location;
-			}
-		}
-	}
-
+    
+    gamePositions[location].setPlayerOccupy(player);
+    
+    if(player == 0){    //means we are removing a token
+        gamePositions[location].setIsOccupied(false);
+    }
+    else{
+        gamePositions[location].setIsOccupied(true);
+    }
 }
 
 
 bool Board::adjacentPositions(int token, int position) {
+    
+    //given the following token, the valid positions are:
+    for(int i = 0; i < gamePositions[token].getAdjacentPositions().size(); i++){
+        if(gamePositions[token].getAdjacentPositions().at(i) == position){
+            return true;
+        }
+    }
 
-	//given the following token, the valid positions are:
-	for (int i = 0; i < 24; i++) {
-		if (gamePositions[i].getPosition() == token) {
-			for (int j = 0; j < gamePositions[i].getAdjacentPositions().size(); j++) {	//getAdjacentPositions returns a vector of int(positions)
-				if (gamePositions[i].getAdjacentPositions().at(j) == position) {	//if the desired position is in the vector
-					return true;
-				}
-			}
-			return false;
-		}
-	}
-
-	return false;
+    return false;
 }
 
 void Board::displayBoard() {
-
-	for (int i = 0; i < 24; i++) {
-
-		//draws the top/bottom row of the board
-		if (gamePositions[i].getPosition() < 2) {
-			cout << gamePositions[i].getPlayerOccupy() << "---------";
-		}
-
-		//draw the middle top row of the board
-		else if (gamePositions[i].getPosition() == 2) {
-			cout << gamePositions[i].getPlayerOccupy() << endl;
-			cout << "|         |         |" << endl;
-		}
-		else if (gamePositions[i].getPosition() == 3) {
-			cout << "|   " << gamePositions[i].getPlayerOccupy() << "-----";
-		}
-
-		else if (gamePositions[i].getPosition() == 4 || gamePositions[i].getPosition() == 19) {
-			cout << gamePositions[i].getPlayerOccupy() << "-----";
-		}
-		else if (gamePositions[i].getPosition() == 5) {
-			cout << gamePositions[i].getPlayerOccupy() << "   |" << endl;
-			cout << "|   |     |     |   |" << endl;
-		}
-		else if (gamePositions[i].getPosition() == 6 || gamePositions[i].getPosition() == 15) {
-			cout << "|   |  " << gamePositions[i].getPlayerOccupy();
-		}
-		else if (gamePositions[i].getPosition() == 7 || gamePositions[i].getPosition() == 16) {
-			cout << "--" << gamePositions[i].getPlayerOccupy() << "--";
-		}
-		else if (gamePositions[i].getPosition() == 8 || gamePositions[i].getPosition() == 17) {
-			cout << gamePositions[i].getPlayerOccupy() << "  |   |" << endl;
-		}
-		else if (gamePositions[i].getPosition() == 9) {
-			cout << "|   |  |     |  |   |" << endl;
-			cout << gamePositions[i].getPlayerOccupy() << "---";
-		}
-		else if (gamePositions[i].getPosition() == 10 || gamePositions[i].getPosition() == 12) {
-			cout << gamePositions[i].getPlayerOccupy() << "--";
-		}
-		else if (gamePositions[i].getPosition() == 11) {
-			cout << gamePositions[i].getPlayerOccupy() << "     ";
-		}
-		else if (gamePositions[i].getPosition() == 13) {
-			cout << gamePositions[i].getPlayerOccupy() << "---";
-		}
-		else if (gamePositions[i].getPosition() == 14) {
-			cout << gamePositions[i].getPlayerOccupy() << endl;
-			cout << "|   |  |     |  |   |" << endl;
-		}
-		else if (gamePositions[i].getPosition() == 18) {
-			cout << "|   |     |     |   |" << endl;
-			cout << "|   " << gamePositions[i].getPlayerOccupy() << "-----";
-		}
-		else if (gamePositions[i].getPosition() == 20) {
-			cout << gamePositions[i].getPlayerOccupy() << "   |" << endl;
-			cout << "|         |         |" << endl;
-		}
-		else if (gamePositions[i].getPosition() == 21 || gamePositions[i].getPosition() == 22) {
-			cout << gamePositions[i].getPlayerOccupy() << "---------";
-		}
-		else {
-			cout << gamePositions[i].getPlayerOccupy() << endl;
-		}
-	}
+    
+    for (int i = 0; i < 24; i++) {
+        
+        //draws the top/bottom row of the board
+        if (i < 2) {
+            cout << gamePositions[i].getPlayerOccupy() << "---------";
+        }
+        
+        //draw the middle top row of the board
+        else if (i == 2) {
+            cout << gamePositions[i].getPlayerOccupy() << endl;
+            cout << "|         |         |" << endl;
+        }
+        else if (i == 3) {
+            cout << "|   " << gamePositions[i].getPlayerOccupy() << "-----";
+        }
+        
+        else if (i == 4 || i == 19) {
+            cout << gamePositions[i].getPlayerOccupy() << "-----";
+        }
+        else if (i == 5) {
+            cout << gamePositions[i].getPlayerOccupy() << "   |" << endl;
+            cout << "|   |     |     |   |" << endl;
+        }
+        else if (i == 6 || i == 15) {
+            cout << "|   |  " << gamePositions[i].getPlayerOccupy();
+        }
+        else if (i == 7 || i == 16) {
+            cout << "--" << gamePositions[i].getPlayerOccupy() << "--";
+        }
+        else if (i == 8 || i == 17) {
+            cout << gamePositions[i].getPlayerOccupy() << "  |   |" << endl;
+        }
+        else if (i == 9) {
+            cout << "|   |  |     |  |   |" << endl;
+            cout << gamePositions[i].getPlayerOccupy() << "---";
+        }
+        else if (i == 10 || i == 12) {
+            cout << gamePositions[i].getPlayerOccupy() << "--";
+        }
+        else if (i == 11) {
+            cout << gamePositions[i].getPlayerOccupy() << "     ";
+        }
+        else if (i == 13) {
+            cout << gamePositions[i].getPlayerOccupy() << "---";
+        }
+        else if (i == 14) {
+            cout << gamePositions[i].getPlayerOccupy() << endl;
+            cout << "|   |  |     |  |   |" << endl;
+        }
+        else if (i == 18) {
+            cout << "|   |     |     |   |" << endl;
+            cout << "|   " << gamePositions[i].getPlayerOccupy() << "-----";
+        }
+        else if (i == 20) {
+            cout << gamePositions[i].getPlayerOccupy() << "   |" << endl;
+            cout << "|         |         |" << endl;
+        }
+        else if (i == 21 || i == 22) {
+            cout << gamePositions[i].getPlayerOccupy() << "---------";
+        }
+        else {
+            cout << gamePositions[i].getPlayerOccupy() << endl;
+        }
+    }
 }
 
-int Board::evaluateBoard(bool maximizingPlayer, int phase) {
-	int CurrentPlayer;
-	int counter = 0;    //used to count for eval8/eval5/eval3
-	int counter2 = 0;	//used for eval5/eval3
-	int counter3 = 0;	//used for eval3
-	int tokencounter = 0;	//used for eval1/eval7
-	int millcounter = 0;
-	int eval1 = 0;
-	//int eval2 = 0;
-	int eval3 = 0;
-	int eval4 = 0;
-	int eval5 = 0;
-	int eval6 = 0;
-	int eval7 = 0;
-	int eval8 = 0;
+int Board::evaluateBoard(int Player, int phase){
+    int flag = 0; //flag = 1 means token placement allowed one mill to be made, flag = 2 means move made two mills possible
+    int counter = 0; //counts to see if all adjacent pieces to a token are blocked, also used for another evaluation to see if current player has more pieces
+    vector<int> millToCheck;    //used to hold positions of a possible mill, mainly to help with readability
+    int score = 0;
+    
+    //number of morrises
+    if(Player == 2){
+        for(int i = 0; i < 24; i++){    //search entire board, if there is a piece that is player 2's check if there is a morris
+            if(gamePositions[i].getPlayerOccupy() == 2){    //check mill spots
+                for(int j = 0; j < gamePositions[i].getMills().size(); j++){
+                    millToCheck = gamePositions[i].getMills().at(j);
+                    if(gamePositions[millToCheck.at(0)].getPlayerOccupy() == 2 && gamePositions[millToCheck.at(1)].getPlayerOccupy() == 2){
+                        score += 50;
+                    }
+                }
+            }
+        }
+    }
+    else{
+        for(int i = 0; i < 24; i++){    //search entire board, if there is a piece that is player 2's check if there is a morris
+            if(gamePositions[i].getPlayerOccupy() == 1){    //check mill spots
+                for(int j = 0; j < gamePositions[i].getMills().size(); j++){
+                    millToCheck = gamePositions[i].getMills().at(j);
+                    if(gamePositions[millToCheck.at(0)].getPlayerOccupy() == 1 && gamePositions[millToCheck.at(1)].getPlayerOccupy() == 1){
+                        score += 50;
+                    }
+                }
+            }
+        }
+    }
+    
+    //if we block a morris of the opponent
+    if(Player == 2){
+        //check if a mill was formed from last placement, each Node has two possible mills
+        for(int i = 0; i < 24; i++){
+            for(int j = 0; j < gamePositions[i].getMills().size(); j++){
+                millToCheck = gamePositions[i].getMills().at(j);
+                //we do 2 times because we know each mill has 2 other positions (what the index is, is considered one position)
+                if(gamePositions[millToCheck.at(0)].getPlayerOccupy() == 2 && gamePositions[millToCheck.at(1)].getPlayerOccupy() == 2){
+                        score += 20;
+                }
+            }
+        }
+    }
+    else{
+        //check if a mill was formed from last placement, each Node has two possible mills
+        for(int i = 0; i < 24; i++){
+            for(int j = 0; j < gamePositions[i].getMills().size(); j++){
+                millToCheck = gamePositions[i].getMills().at(j);
+                //we do 2 times because we know each mill has 2 other positions (what the index is, is considered one position)
+                if(gamePositions[millToCheck.at(0)].getPlayerOccupy() == 1 && gamePositions[millToCheck.at(1)].getPlayerOccupy() == 1){
+                    score += 8;
+                }
+            }
+        }
+    }
+    
+    //if we almost create a mill (one spot is unoccupied)
+    if(Player == 2){
+        for(int i = 0; i < 24; i++){
+            //check if the last placement brought us closer to a mill
+            for(int j = 0; j < 2; j++){
+                millToCheck = gamePositions[i].getMills().at(j);
+                
+                //we do 2 times because we know each mill has 2 other positions
+                if(gamePositions[millToCheck.at(0)].getPlayerOccupy() == 2){
+                    if(gamePositions[millToCheck.at(1)].getPlayerOccupy() != 1){   //make sure that there is a spot open for mill, or else that move is not good
+                        flag++;
+                        score += ;
+                    }
+                }
+                else if(gamePositions[millToCheck.at(1)].getPlayerOccupy() == 2){
+                    if(gamePositions[millToCheck.at(0)].getPlayerOccupy() != 1){
+                        flag++;
+                        score += 20;
+                    }
+                }
+            }
+            if(flag == 2){  //this means two way mill was made possible
+                score += 8;
+            }
+        }
+    }
+    else{   //for player 1
+        for(int i = 0; i < 24; i++){
+            //check if the last placement brought us closer to a mill
+            for(int j = 0; j < 2; j++){
+                millToCheck = gamePositions[i].getMills().at(j);
+                
+                //we do 2 times because we know each mill has 2 other positions
+                if(gamePositions[millToCheck.at(0)].getPlayerOccupy() == 1){
+                    if(gamePositions[millToCheck.at(1)].getPlayerOccupy() != 2){   //make sure that there is a spot open for mill, or else that move is not good
+                        flag++;
+                        score += 5;
+                    }
+                }
+                else if(gamePositions[millToCheck.at(1)].getPlayerOccupy() == 1){
+                    if(gamePositions[millToCheck.at(0)].getPlayerOccupy() != 2){
+                        flag++;
+                        score += 5;
+                    }
+                }
+            }
+            if(flag == 2){  //this means two way mill was made possible
+                score += 8;
+            }
+        }
+    }
+    
+    //check if move was blocked
+    /*if(Player == 2){
+        if(positionLastPlacedP2 != -1 && positionLastPlacedP1 != -1){
+            //for every adjacent position, if it is the opposing player, check all adjacent pieces of that position
+            //for that position, if all of its adjacent pieces blocks it from moving (current player), then we add to score
+            for(int i = 0; i < gamePositions[positionLastPlacedP2].getAdjacentPositions().size(); i++){
+                if(gamePositions[gamePositions[positionLastPlacedP2].getAdjacentPositions().at(i)].getPlayerOccupy() == 1){
+                    //check the adjacent positions of that, to see if its blocked
+                    int newPositionToCheck = gamePositions[positionLastPlacedP2].getAdjacentPositions().at(i);
+                    for(int j = 0; j < gamePositions[newPositionToCheck].getAdjacentPositions().size(); j++){
+                        if(gamePositions[newPositionToCheck].getAdjacentPositions().at(j) == 2){
+                            counter++;
+                            if(counter == gamePositions[newPositionToCheck].getAdjacentPositions().size()){
+                                score += 5;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else{
+        if(positionLastPlacedP2 != -1 && positionLastPlacedP1 != -1){
+            for(int i = 0; i < gamePositions[positionLastPlacedP1].getAdjacentPositions().size(); i++){
+                if(gamePositions[gamePositions[positionLastPlacedP1].getAdjacentPositions().at(i)].getPlayerOccupy() == 2){
+                    //check the adjacent positions of that, to see if its blocked
+                    int newPositionToCheck = gamePositions[positionLastPlacedP1].getAdjacentPositions().at(i);
+                    for(int j = 0; j < gamePositions[newPositionToCheck].getAdjacentPositions().size(); j++){
+                        if(gamePositions[newPositionToCheck].getAdjacentPositions().at(j) == 1){
+                            counter++;
+                            if(counter == gamePositions[newPositionToCheck].getAdjacentPositions().size()){
+                                score += 5;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }*/
 
-	if (maximizingPlayer) {
-		CurrentPlayer = 1;
-	}
-	else {
-		CurrentPlayer = 2;
-	}
+    //count to see if you have more pieces than the opponent (this is needed so the AI can place a move despite not having any initial benefit)
+    if(phase == 1){
+        counter = 0;
+        for (int i = 0; i < 24; i++) {
+            if (gamePositions[i].getPlayerOccupy() == Player) {
+                counter++;
+            }
+            else if (gamePositions[i].getPlayerOccupy() != 0) {
+                counter--;
+            }
+        }
+        if(counter > 0){
+            score += 3;
+        }
+        else if(counter == 0){
+            score += 2;
+        }
+        else{
+            score += 1;
+        }
+    }
+    
+    //see if its a winning move
+    if(phase == 3){
+        counter = 0;
+        for (int i = 0; i < 24; i++) {
+            if (gamePositions[i].getPlayerOccupy() != Player && gamePositions[i].getPlayerOccupy() != 0) {    //if opposing player's total token count is less than 3
+                counter++;
+            }
+        }
+        if (counter < 3) {
+            score += 50;
+        }
+    }
+    counter = 0;
 
-	//evaluation scenario 1: if 3 in a row is formed return 1, if -1 is closed by the opponent in last move
-	if (CurrentPlayer == 1) {	//for maximizing player
-		for (int i = 0; i < 24; i++) {
-			if (gamePositions[i].getPosition() == positionLastPlacedP1) {
-				vector <vector<int>> possibleMills = gamePositions[i].getMills();
-				for (int j = 0; j < 2; j++) {	//2 possible mill combinations for each point on the board
-					vector<int> millLocation = possibleMills.at(j);
-					for (int k = 0; k < 2; k++) {	//for each possible combination, check the spot to see if is occupied by p1
-						for (int l = 0; l < 24; l++) {	//find the node with this position
-							if (gamePositions[l].getPosition() == millLocation.at(k)) {
-								if (gamePositions[l].getPlayerOccupy() == CurrentPlayer) {
-									tokencounter++;
-									if (tokencounter == 2) {	//if mill is formed
-										eval1 = 1;
-										break;
-									}
-								}
-							}
-						}
-						tokencounter = 0;	//reset the counter to check if next mill combo is good
-					}
-				}
-				break;
-			}
-		}
-		for (int i = 0; i < 24; i++) {	//check if the second player 
-			if (gamePositions[i].getPosition() == positionLastPlacedP2) {
-				vector <vector<int>> possibleMills = gamePositions[i].getMills();
-				for (int j = 0; j < 2; j++) {	//2 possible mill combinations for each point on the board
-					vector<int> millLocation = possibleMills.at(j);
-					for (int k = 0; k < 2; k++) {	//for each possible combination, check the spot to see if is occupied by p1
-						for (int l = 0; l < 24; l++) {	//find the node with this position
-							if (gamePositions[l].getPosition() == millLocation.at(k)) {
-								if (gamePositions[l].getPlayerOccupy() == 2) {
-									tokencounter++;
-									if (tokencounter == 2) {	//if mill is formed
-										eval1 = 1;
-										break;
-									}
-								}
-							}
-						}
-						tokencounter = 0;	//reset the counter to check if next mill combo is good
-					}
-				}
-				break;
-			}
-		}
-		eval1 = 0;
-	}
-	else {	// for non maximizing player
-		for (int i = 0; i < 24; i++) {
-			if (gamePositions[i].getPosition() == positionLastPlacedP1) {
-				vector <vector<int>> possibleMills = gamePositions[i].getMills();
-				for (int j = 0; j < 2; j++) {	//2 possible mill combinations for each point on the board
-					vector<int> millLocation = possibleMills.at(j);
-					for (int k = 0; k < 2; k++) {	//for each possible combination, check the spot to see if is occupied by p1
-						for (int l = 0; l < 24; l++) {	//find the node with this position
-							if (gamePositions[l].getPosition() == millLocation.at(k)) {
-								if (gamePositions[l].getPlayerOccupy() == 2) {
-									tokencounter++;
-									if (tokencounter == 2) {	//if mill is formed
-										eval1 = 1;
-										break;
-									}
-								}
-							}
-						}
-						tokencounter = 0;	//reset the counter to check if next mill combo is good
-					}
-				}
-				break;
-			}
-		}
-		for (int i = 0; i < 24; i++) {	//check if the second player 
-			if (gamePositions[i].getPosition() == positionLastPlacedP2) {
-				vector <vector<int>> possibleMills = gamePositions[i].getMills();
-				for (int j = 0; j < 2; j++) {	//2 possible mill combinations for each point on the board
-					vector<int> millLocation = possibleMills.at(j);
-					for (int k = 0; k < 2; k++) {	//for each possible combination, check the spot to see if is occupied by p1
-						for (int l = 0; l < 24; l++) {	//find the node with this position
-							if (gamePositions[l].getPosition() == millLocation.at(k)) {
-								if (gamePositions[l].getPlayerOccupy() == 1) {
-									tokencounter++;
-									if (tokencounter == 2) {	//if mill is formed
-										eval1 = 1;
-										break;
-									}
-								}
-							}
-						}
-						tokencounter = 0;	//reset the counter to check if next mill combo is good
-					}
-				}
-				break;
-			}
-		}
-		eval1 = 0;
-	}
-
-	//evaluation scenario 2: difference in number of morrises
-	/*for (int i = 0; i < 24; i++) {
-		if (gamePositions[i].getPosition() == positionLastPlacedP1) {
-			vector <vector<int>> possibleMills = gamePositions[i].getMills();
-			for (int j = 0; j < 2; j++) {	//2 possible mill combinations for each point on the board
-				vector<int> millLocation = possibleMills.at(j);
-				for (int k = 0; k < 2; k++) {	//for each possible combination, check the spot to see if is occupied by p1
-					if (gamePositions[k].getPosition() == 1) {
-						millcounter++;
-						if (millcounter == 2) {	//if mill is formed, we can return 1, don't need to check the other mill combo
-							return 1;
-						}
-					}
-					millcounter = 0;	//reset the counter to check if next mill combo is good
-				}
-			}
-			break;
-		}
-	}*/
-
-	//evaluation scenario 3: difference between the number of blocked pieces
-	counter = 0;
-	counter2 = 0;
-	counter3 = 0;
-	for (int i = 0; i < 24; i++) {
-		if (gamePositions[i].getPlayerOccupy() == CurrentPlayer) {	//checking for current player but this will benefit opponent player
-			for (int j = 0; j < gamePositions[i].getAdjacentPositions().size(); j++) {	//loop through adjacent pieces to see if its blocked
-				if (gamePositions[i].getAdjacentPositions().at(j) != CurrentPlayer && gamePositions[i].getAdjacentPositions().at(j) != 0) {	//this means it is blocked
-					counter++;
-				}
-				if (counter == gamePositions[i].getAdjacentPositions().size()) {	//the piece is blocked
-					counter2++;
-				}
-			}
-			counter = 0;
-		}
-		else if (gamePositions[i].getPlayerOccupy() != 0) {	//opponent player
-			for (int j = 0; j < gamePositions[i].getAdjacentPositions().size(); j++) {	//loop through adjacent pieces to see if its blocked
-				if (gamePositions[i].getAdjacentPositions().at(j) == CurrentPlayer) {	//this means it is blocked
-					counter++;
-				}
-				if (counter == gamePositions[i].getAdjacentPositions().size()) {	//the piece is blocked
-					counter3++;
-				}
-			}
-			counter = 0;
-		}
-	}
-	if (CurrentPlayer == 1) {
-		eval3 = counter2 - counter3;
-	}
-	else {
-		eval3 = counter3 - counter2;
-	}
-
-	//evaluation scenario 4: difference between number of tokens
-	for (int i = 0; i < 24; i++) {
-		if (gamePositions[i].getPlayerOccupy() == CurrentPlayer) {
-			eval4++;
-		}
-		else if (gamePositions[i].getPlayerOccupy() != 0) {
-			eval4--;
-		}
-	}
-
-	//evaluation scenario 5: difference in number of pairs of tokens
-	counter = 0;
-	counter2 = 0;
-	for (int i = 0; i < 24; i++) {	//check for player 1
-		if (gamePositions[i].getPlayerOccupy() == 1) {	//check if max player
-			for (int j = 0; j < gamePositions[i].getAdjacentPositions().size(); j++) {	//check all adjacent spots
-				if (gamePositions[i].getAdjacentPositions().at(j) == 1) {
-					counter++;
-				}
-			}
-		}
-	}
-	for (int i = 0; i < 24; i++) {	//check for player 2
-		if (gamePositions[i].getPlayerOccupy() == 2) {	//check if max player
-			for (int j = 0; j < gamePositions[i].getAdjacentPositions().size(); j++) {	//check all adjacent spots
-				if (gamePositions[i].getAdjacentPositions().at(j) == 2) {
-					counter2++;
-				}
-			}
-		}
-	}
-	if (CurrentPlayer == 1) {
-		eval5 = counter - counter2;
-	}
-	else {
-		eval5 = counter2 - counter;
-	}
-
-	//evaluation scenario 6: if the move allows player to have two ways to create morris
-
-	//evaluation scenario 7: number of double morrises
-	counter = 0;	//count how many double morrises a player has
-	counter2 = 0;	//count how many double morrises another player has
-	tokencounter = 0;	//2 tokens make a mill
-	millcounter = 0;	//2 mills will equal a double morris
-	for (int i = 0; i < 24; i++) {
-		if (gamePositions[i].getPosition() == CurrentPlayer) {
-			vector <vector<int>> possibleMills = gamePositions[i].getMills();
-			for (int j = 0; j < 2; j++) {	//2 possible mill combinations for each point on the board
-				vector<int> millLocation = possibleMills.at(j);
-				for (int k = 0; k < 2; k++) {	//for each possible combination, check the spot to see if is occupied by p1
-					for (int l = 0; l < 24; l++) {	//find the node with this position
-						if (gamePositions[l].getPosition() == millLocation.at(k)) {
-							if (gamePositions[l].getPlayerOccupy() == CurrentPlayer) {
-								tokencounter++;
-								if (tokencounter == 2) {	//if mill is formed
-									millcounter++;
-								}
-							}
-						}
-					}
-					if (millcounter == 2) {	//if two mill, it means double morris
-						counter++;
-					}
-					tokencounter = 0;
-				}
-			}
-			millcounter = 0;
-		}
-		else if (gamePositions[i].getPosition() != 0) {
-			vector <vector<int>> possibleMills = gamePositions[i].getMills();
-			for (int j = 0; j < 2; j++) {	//2 possible mill combinations for each point on the board
-				vector<int> millLocation = possibleMills.at(j);
-				for (int k = 0; k < 2; k++) {	//for each possible combination, check the spot to see if is occupied by p1
-					for (int l = 0; l < 24; l++) {	//find the node with this position
-						if (gamePositions[l].getPosition() == millLocation.at(k)) {
-							if (gamePositions[l].getPlayerOccupy() == CurrentPlayer) {
-								tokencounter++;
-								if (tokencounter == 2) {	//if mill is formed
-									millcounter++;
-								}
-							}
-						}
-					}
-					if (millcounter == 2) {	//if two mill, it means double morris
-						counter2++;
-					}
-					tokencounter = 0;
-				}
-			}
-			millcounter = 0;
-		}
-	}
-	if (CurrentPlayer == 1) {
-		eval7 = counter - counter2;
-	}
-	else {
-		eval7 = counter2 - counter;
-	}
-
-	//evaluation scenario 8: if the state is winning/losing
-	counter = 0;
-	for (int i = 0; i < 24; i++) {
-		if (gamePositions[i].getPlayerOccupy() != CurrentPlayer && gamePositions[i].getPlayerOccupy() != 0) {    //if opposing player's total token count is less than 3
-			counter++;
-		}
-	}
-	if (counter < 3) {
-		eval8 = 1;
-	}
-	else {
-		eval8 = -1;
-	}
-
-	//calculating the total evaluation points
-	if (phase == 1) {	//26*(2) , 7*(6)
-		return 18*(eval1) + 1*(eval3) + 9*(eval4) + 10*(eval5);
-	}
-	else if (phase == 2) {	//43*(2)
-		return 14*(eval1) + 10*(eval3) + 11*(eval4) + 8*(eval7) + 1086*(eval8);
-	}
-	else {	// + 1*(6)
-		return 16*(eval1) + 10*(eval5) + 1190*(eval8);
-	}
+    return score;
 }
 
-vector<Board> Board::generateBoard(bool maximizingPlayer, int phase) {
-	//temp vector used to store boards as we generate them
-	vector<Board> temp_vec;
-	int CurrentPlayer = 0;
-
-	if (maximizingPlayer) {
-		CurrentPlayer = 1;
-	}
-	else {
-		CurrentPlayer = 2;
-	}
-
-	//different possible boards for each, we assuming maximizing player is player 1
-	if (phase == 1) {	//phase 1
-		for (int i = 0; i < 24; i++) {
-			if (gamePositions[i].getIsOccupied() == false) {		//find the open spot and put the maximizingplayer's token on it
-				Board newBoard(gamePositions);		//used to create new object to put into vector
-				newBoard.setBoard(i, CurrentPlayer);			//change the location where we found the empty spot and put the player's token
-				newBoard.setPositionLastPlaced(i, CurrentPlayer);
-				temp_vec.push_back(newBoard);	//add this instance to the vector
-			}
-		}
-
-		return temp_vec;
-	}
-	else if (phase == 2) {	//phase 2
-		for (int i = 0; i < 24; i++) {
-			if (gamePositions[i].getPlayerOccupy() == CurrentPlayer) {	//if there is a token on the piece
-				for (int j = 0; j < gamePositions[i].getAdjacentPositions().size(); j++) { //get the adjacent positions
-					for (int k = 0; k < 24; k++) {	//find the board of the adjacent positions
-						if (gamePositions[k].getPosition() == gamePositions[i].getAdjacentPositions().at(j) && gamePositions[k].getIsOccupied() == false) {
-							Board newBoard(gamePositions);
-							newBoard.setBoard(i, 0);	//set the position of the desired token that we want to move, to 0
-							newBoard.setBoard(k, CurrentPlayer);	//set the adjacent position to maximizing player
-							newBoard.setPositionLastPlaced(k, CurrentPlayer);
-							temp_vec.push_back(newBoard);
-						}
-					}
-				}
-			}
-		}
-		return temp_vec;
-	}
-	else {	//phase 3
-		for (int i = 0; i < 24; i++) {
-			if (gamePositions[i].getPlayerOccupy() == CurrentPlayer) {
-				for (int j = 0; j < 24; j++) {	//for each spot that is empty, you can generate a board for it
-					if (gamePositions[j].getIsOccupied() == false) {
-						Board newBoard(gamePositions);
-						newBoard.setBoard(i, 0);
-						newBoard.setBoard(j, CurrentPlayer);
-						newBoard.setPositionLastPlaced(j, CurrentPlayer);
-						temp_vec.push_back(newBoard);
-					}
-				}
-			}
-		}
-		return temp_vec;
-	}
+//player 2 = AI(max player), player 1 = Human(min player)
+vector<Board> Board::generateBoard(int Player, int phase) {
+    //temp vector used to store boards as we generate them
+    vector<Board> temp_vec;
+    
+    //different possible boards for each, we assuming maximizing player is player 1
+    if (phase == 1) {	//phase 1
+        for (int i = 0; i < 24; i++) {
+            if (gamePositions[i].getIsOccupied() == false) {		//find the open spot and put the maximizingplayer's token on it
+                Board newBoard(gamePositions,positionLastPlacedP1,positionLastPlacedP2);
+                //used to create new object to put into vector
+                newBoard.setBoard(i, Player);		//change the location where we found the empty spot and put the player's token
+                newBoard.setPositionLastPlaced(i, Player);
+                temp_vec.push_back(newBoard);	//add this instance to the vector
+            }
+        }
+        
+        return temp_vec;
+    }
+    else if (phase == 2) {	//phase 2
+        for (int i = 0; i < 24; i++) {
+            if (gamePositions[i].getPlayerOccupy() == Player) {	//if there is a token on the piece
+                for (int j = 0; j < gamePositions[i].getAdjacentPositions().size(); j++) { //get the adjacent positions
+                    if(gamePositions[gamePositions[i].getAdjacentPositions().at(j)].getIsOccupied() == false) {	//find the board of the adjacent positions
+                        Board newBoard(gamePositions,positionLastPlacedP1,positionLastPlacedP2);
+                        newBoard.setBoard(i, 0);	//set the position of the desired token that we want to move, to 0
+                        newBoard.setBoard(gamePositions[i].getAdjacentPositions().at(j), Player);	//set the adjacent position to maximizing player
+                        newBoard.setPositionLastPlaced(gamePositions[i].getAdjacentPositions().at(j), Player);
+                        temp_vec.push_back(newBoard);
+                    }
+                }
+            }
+        }
+        return temp_vec;
+    }
+    else {	//phase 3
+        for (int i = 0; i < 24; i++) {
+            if (gamePositions[i].getPlayerOccupy() == Player) {
+                for (int j = 0; j < 24; j++) {	//for each spot that is empty, you can generate a board for it
+                    if (gamePositions[j].getIsOccupied() == false) {
+                        Board newBoard(gamePositions,positionLastPlacedP1,positionLastPlacedP2);
+                        newBoard.setBoard(i, 0);
+                        newBoard.setBoard(j, Player);
+                        newBoard.setPositionLastPlaced(j, Player);
+                        temp_vec.push_back(newBoard);
+                    }
+                }
+            }
+        }
+        return temp_vec;
+    }
+    
+    //if removing phase, generate possible removes
+    
 }
 
 int Board::getPosLastPlaced(int player) {
-	if (player == 1) {
-		return positionLastPlacedP1;
-	}
-	else {
-		return positionLastPlacedP2;
-	}
+    if (player == 1) {
+        return positionLastPlacedP1;
+    }
+    else {
+        return positionLastPlacedP2;
+    }
 }
 
 void Board::setPositionLastPlaced(int position, int player) {
-	if (player == 1) {
-		positionLastPlacedP1 = position;
-	}
-	else {
-		positionLastPlacedP2 = position;
-	}
+    if (player == 1) {
+        positionLastPlacedP1 = position;
+    }
+    else {
+        positionLastPlacedP2 = position;
+    }
 }
