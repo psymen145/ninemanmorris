@@ -266,10 +266,10 @@ bool NineManMorris::isGameOver() {
 }
 
 //first checks if it is time to change phases
-void NineManMorris::play(int player, int token, int MoveTo) {
+bool NineManMorris::play(int player, int token, int MoveTo, int playType) {
 
 	//placing stage
-	if (phase == 1) {
+	if (phase == 1 && playType == 0) {
 		gameboard.setBoard(MoveTo, player);
 		if (player == 1) {
 			numOfTokensInHandP1--;
@@ -277,20 +277,36 @@ void NineManMorris::play(int player, int token, int MoveTo) {
 		if (player == 2) {
 			numOfTokensInHandP2--;
 		}
+		gameboard.setPositionLastPlaced(MoveTo, player);
 	}
 	//moving phase
-	else if (phase == 2) {
+	else if (phase == 2 && playType == 0) {
 		//change the spot where the player wants to move to
 		gameboard.setBoard(MoveTo, player);
 		//remove the spot where the player's token originally was. This gives the image that the token is moving
 		gameboard.setBoard(token, 0);
+		gameboard.setPositionLastPlaced(MoveTo, player);
 	}
-	else if (phase == 3) {
+	else if (phase == 3 && playType == 0) {
 		//change the spot where the player wants to move to
 		gameboard.setBoard(MoveTo, player);
 		//remove the spot where the player's token originally was. This gives the image that the token is moving
 		gameboard.setBoard(token, 0);
+		gameboard.setPositionLastPlaced(MoveTo, player);
 	}
+
+	if (playType) {    //means we are removing a piece because a mill was formed
+		if (gameboard.getBoard(token) == 0 || gameboard.getBoard(token) == player) {
+			return false;
+		}
+		else {
+			gameboard.tokenRemove = 0;  //used for AI to know that it is turn to remove a token or not
+			gameboard.setBoard(token, 0);
+			return true;
+		}
+	}
+
+	return true;
 }
 
 //will check if move is valid first. If it is, then the board's function to actually complete the action is called
@@ -378,178 +394,178 @@ int NineManMorris::getNumTokensP2() {
 	return numOfTokensInHandP2;
 }
 
-void NineManMorris::checkTriple(int currentplayer, int spot) {
-	//variable to hold user input about what token they want to remove
-	int desiredRemove;
-	int flag = 0;   //signals if there is a row, then we can prompt a token to be removed at the end of the function
-
-					//given a spot, see if the two possible lines (horizontal/vertical) have 3 in a row
+bool NineManMorris::checkTriple(int currentplayer, int spot) {
+	//given a spot, see if the two possible lines (horizontal/vertical) have 3 in a row
 	if (spot == 0) {
 
 		if ((gameboard.getBoard(1) == currentplayer && gameboard.getBoard(2) == currentplayer) || (gameboard.getBoard(9) == currentplayer && gameboard.getBoard(21) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 1) {
 
 		if ((gameboard.getBoard(0) == currentplayer && gameboard.getBoard(2) == currentplayer) || (gameboard.getBoard(4) == currentplayer && gameboard.getBoard(7) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 2) {
 
 		if ((gameboard.getBoard(0) == currentplayer && gameboard.getBoard(1) == currentplayer) || (gameboard.getBoard(23) == currentplayer && gameboard.getBoard(14) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 3) {
 
 		if ((gameboard.getBoard(4) == currentplayer && gameboard.getBoard(5) == currentplayer) || (gameboard.getBoard(10) == currentplayer && gameboard.getBoard(18) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 4) {
 
 		if ((gameboard.getBoard(3) == currentplayer && gameboard.getBoard(5) == currentplayer) || (gameboard.getBoard(2) == currentplayer && gameboard.getBoard(7) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 5) {
 
 		if ((gameboard.getBoard(3) == currentplayer && gameboard.getBoard(4) == currentplayer) || (gameboard.getBoard(13) == currentplayer && gameboard.getBoard(20) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 6) {
 
 		if ((gameboard.getBoard(7) == currentplayer && gameboard.getBoard(8) == currentplayer) || (gameboard.getBoard(11) == currentplayer && gameboard.getBoard(15) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 7) {
 
 		if ((gameboard.getBoard(6) == currentplayer && gameboard.getBoard(8) == currentplayer) || (gameboard.getBoard(1) == currentplayer && gameboard.getBoard(4) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 8) {
 
 		if ((gameboard.getBoard(6) == currentplayer && gameboard.getBoard(7) == currentplayer) || (gameboard.getBoard(12) == currentplayer && gameboard.getBoard(16) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 9) {
 
 		if ((gameboard.getBoard(10) == currentplayer && gameboard.getBoard(11) == currentplayer) || (gameboard.getBoard(0) == currentplayer && gameboard.getBoard(21) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 10) {
 
 		if ((gameboard.getBoard(9) == currentplayer && gameboard.getBoard(11) == currentplayer) || (gameboard.getBoard(3) == currentplayer && gameboard.getBoard(18) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 11) {
 
 		if ((gameboard.getBoard(15) == currentplayer && gameboard.getBoard(6) == currentplayer) || (gameboard.getBoard(9) == currentplayer && gameboard.getBoard(10) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 12) {
 
 		if ((gameboard.getBoard(13) == currentplayer && gameboard.getBoard(14) == currentplayer) || (gameboard.getBoard(8) == currentplayer && gameboard.getBoard(17) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 13) {
 
 		if ((gameboard.getBoard(12) == currentplayer && gameboard.getBoard(14) == currentplayer) || (gameboard.getBoard(20) == currentplayer && gameboard.getBoard(5) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 14) {
 
 		if ((gameboard.getBoard(12) == currentplayer && gameboard.getBoard(13) == currentplayer) || (gameboard.getBoard(2) == currentplayer && gameboard.getBoard(23) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 15) {
 
 		if ((gameboard.getBoard(6) == currentplayer && gameboard.getBoard(11) == currentplayer) || (gameboard.getBoard(16) == currentplayer && gameboard.getBoard(17) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 16) {
 
 		if ((gameboard.getBoard(15) == currentplayer && gameboard.getBoard(17) == currentplayer) || (gameboard.getBoard(19) == currentplayer && gameboard.getBoard(22) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 17) {
 
 		if ((gameboard.getBoard(15) == currentplayer && gameboard.getBoard(16) == currentplayer) || (gameboard.getBoard(8) == currentplayer && gameboard.getBoard(12) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 18) {
 
 		if ((gameboard.getBoard(3) == currentplayer && gameboard.getBoard(10) == currentplayer) || (gameboard.getBoard(19) == currentplayer && gameboard.getBoard(20) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 19) {
 
 		if ((gameboard.getBoard(18) == currentplayer && gameboard.getBoard(20) == currentplayer) || (gameboard.getBoard(22) == currentplayer && gameboard.getBoard(16) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 20) {
 
 		if ((gameboard.getBoard(18) == currentplayer && gameboard.getBoard(19) == currentplayer) || (gameboard.getBoard(5) == currentplayer && gameboard.getBoard(13) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 21) {
 
 		if ((gameboard.getBoard(0) == currentplayer && gameboard.getBoard(9) == currentplayer) || (gameboard.getBoard(22) == currentplayer && gameboard.getBoard(23) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 22) {
 
 		if ((gameboard.getBoard(21) == currentplayer && gameboard.getBoard(23) == currentplayer) || (gameboard.getBoard(16) == currentplayer && gameboard.getBoard(19) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 	else if (spot == 23) {
 
 		if ((gameboard.getBoard(2) == currentplayer && gameboard.getBoard(14) == currentplayer) || (gameboard.getBoard(22) == currentplayer && gameboard.getBoard(21) == currentplayer)) {
-			flag = 1;
+			gameboard.tokenRemove = 1;
+			return true;
 		}
 	}
 
-	//prompt for user input if flag is 1 (if a row is formed)
-	if (flag == 1) {
-		while (flag == 1) {
-			cout << "Player " << currentplayer << " please remove an opponent's token: " << endl;
-			cin >> desiredRemove;
-
-			//check if the selected position has a token
-			if (currentplayer == 1) {
-				if (gameboard.getBoard(desiredRemove) == 2) {
-					gameboard.setBoard(desiredRemove, 0);
-					flag = 0;   //flag is 0, so we know a valid token is chosen to be removed
-				}
-			}
-			else if (currentplayer == 2) {
-				if (gameboard.getBoard(desiredRemove) == 1) {
-					gameboard.setBoard(desiredRemove, 0);
-					flag = 0;
-				}
-			}
-		}
-	}
+	return false;
 }
 
 int NineManMorris::getTokensPlaced(int player) {
@@ -565,45 +581,65 @@ int NineManMorris::getTokensPlaced(int player) {
 	return counter;
 }
 
-int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, bool maximizingPlayer) {
+int NineManMorris::playAI() {
+
+	vector<Board> allBoards = gameboard.generateBoard(2, phase); //get all the possible boards for the current state (1 depth down);
+	int bestScore = INT_MIN;
+	int currentScore = 0;
+	Board bestBoard;
+	int position;
+
+	alphabeta(gameboard, 3, INT_MIN, INT_MAX, 2, position);
+
+	cout << "This position: " << position << endl;
+	gameboard.setBoard(position, 2);
+	return position;
+}
+
+//maxPlayer = 2 means the AI, maxPlayer = 1 means the human
+int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, int Player, int& position) {
 	//v will be the value passed up the tree
 	int v;
 
 	//check if a player won in the given board node
 	if (isGameOver()) {
-		return TreeNode.evaluateBoard(maximizingPlayer, phase);
+		return TreeNode.evaluateBoard(Player, phase);
 	}
 
 	//check if last node in branch
 	if (depth == 0) {
 		//return the heuristic value of node, this will generate the v value for the bottom node
-		return TreeNode.evaluateBoard(maximizingPlayer, phase);
+		return TreeNode.evaluateBoard(Player, phase);
 	}
 
-	if (maximizingPlayer) {
+	if (Player == 2) {
 		v = INT_MIN;
 
 		//generate all children
-		vector<Board> possibleBoards = TreeNode.generateBoard(maximizingPlayer, phase);
+		vector<Board> possibleBoards = TreeNode.generateBoard(Player, phase);
 
 		for (int i = 0; i < possibleBoards.size(); i++) {
 			//see which child is the best choice
-			v = max(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, false));
-			alpha = max(alpha, v);
+			v = max(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, 1, position));
+			//alpha = max(alpha, v);
+			if (alpha < v) {
+				alpha = v;
+				position = possibleBoards.at(i).getPosLastPlaced(2);
+			}
 			if (beta <= alpha) {
 				break;		//beta cut - off
 			}
 		}
-		return v;
+		return v;	//goes back up to parent node
 	}
 	else {
 		v = INT_MAX;
 
 		//generate child nodes
-		vector<Board> possibleBoards = TreeNode.generateBoard(maximizingPlayer, phase);
+		vector<Board> possibleBoards = TreeNode.generateBoard(Player, phase);
 
 		for (int i = 0; i < possibleBoards.size(); i++) {
-			v = min(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, true));
+			v = min(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, 2, position));
 			beta = min(beta, v);
 			if (beta <= alpha) {
 				break;		//alpha cut - off
@@ -613,62 +649,11 @@ int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, boo
 	}
 }
 
-void NineManMorris::testFunc() {
-	gameboard.setBoard(23, 1);
-
-	vector<Board> test_vec = gameboard.generateBoard(true, 3);
-
-	for (int i = 0; i < test_vec.size(); i++) {
-		test_vec.at(i).displayBoard();
-	}
-
-}
-
-//overloaded function that gets called from main
-int NineManMorris::alphabeta(int depth, int alpha, int beta, bool maximizingPlayer) {
-	//v will be the value passed up the tree
-	int v;
-
-	//check if a player won in the given board node
-	if (isGameOver()) {
-		return gameboard.evaluateBoard(maximizingPlayer, phase);
-	}
-
-	//check if last node in branch
-	if (depth == 0) {
-		//return the heuristic value of node, this will generate the v value for the bottom node
-		return gameboard.evaluateBoard(maximizingPlayer, phase);
-	}
-
-	if (maximizingPlayer) {
-		v = INT_MIN;
-
-		//generate all children
-		vector<Board> possibleBoards = gameboard.generateBoard(maximizingPlayer, phase);
-
-		for (int i = 0; i < possibleBoards.size(); i++) {
-			//see which child is the best choice
-			v = max(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, false));
-			alpha = max(alpha, v);
-			if (beta <= alpha) {
-				break;		//beta cut - off
-			}
+void NineManMorris::playAIRemove() {
+	for (int i = 0; i < 24; i++) {
+		if (gameboard.getBoard(i) == 1) {
+			//test, just remove first opponent token we see
+			gameboard.setBoard(i, 0);
 		}
-		return v;
-	}
-	else {
-		v = INT_MAX;
-
-		//generate child nodes
-		vector<Board> possibleBoards = gameboard.generateBoard(maximizingPlayer, phase);
-
-		for (int i = 0; i < possibleBoards.size(); i++) {
-			v = min(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, true));
-			beta = min(beta, v);
-			if (beta <= alpha) {
-				break;		//alpha cut - off
-			}
-		}
-		return v;
 	}
 }

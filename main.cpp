@@ -52,7 +52,7 @@ int main() {
 					cin >> moveToPosition;
 
 					if (NineManGame.isValid(CurrentPlayer, token, moveToPosition)) {
-						NineManGame.play(CurrentPlayer, -1, moveToPosition);
+						NineManGame.play(CurrentPlayer, -1, moveToPosition,0);
 
 						//tell player how many tokens they have left in hand
 						if (CurrentPlayer == 1) {
@@ -75,7 +75,7 @@ int main() {
 					cin >> moveToPosition;
 
 					if (NineManGame.isValid(CurrentPlayer, token, moveToPosition)) {
-						NineManGame.play(CurrentPlayer, token, moveToPosition);
+						NineManGame.play(CurrentPlayer, token, moveToPosition,0);
 					}
 					else {
 						cout << "\nInvalid Move!" << endl;
@@ -88,7 +88,7 @@ int main() {
 					cout << endl << "Where would you like to move the token: ";
 					cin >> moveToPosition;
 					if (NineManGame.isValid(CurrentPlayer, token, moveToPosition)) {
-						NineManGame.play(CurrentPlayer, token, moveToPosition);
+						NineManGame.play(CurrentPlayer, token, moveToPosition,0);
 					}
 					else {
 						cout << "\nInvalid Move!" << endl;
@@ -176,7 +176,7 @@ int main() {
 						cin >> moveToPosition;
 
 						if (NineManGame.isValid(CurrentPlayer, token, moveToPosition)) {
-							NineManGame.play(CurrentPlayer, -1, moveToPosition);
+							NineManGame.play(CurrentPlayer, -1, moveToPosition,0);
 
 							//tell player how many tokens they have left in hand
 							if (CurrentPlayer == 1) {
@@ -199,7 +199,7 @@ int main() {
 						cin >> moveToPosition;
 
 						if (NineManGame.isValid(CurrentPlayer, token, moveToPosition)) {
-							NineManGame.play(CurrentPlayer, token, moveToPosition);
+							NineManGame.play(CurrentPlayer, token, moveToPosition,0);
 						}
 						else {
 							cout << "\nInvalid Move!" << endl;
@@ -212,7 +212,7 @@ int main() {
 						cout << endl << "Where would you like to move the token: ";
 						cin >> moveToPosition;
 						if (NineManGame.isValid(CurrentPlayer, token, moveToPosition)) {
-							NineManGame.play(CurrentPlayer, token, moveToPosition);
+							NineManGame.play(CurrentPlayer, token, moveToPosition,0);
 						}
 						else {
 							cout << "\nInvalid Move!" << endl;
@@ -222,7 +222,20 @@ int main() {
 
 					//check if there is a triple only if move was valid (indicated by flag still being 0)
 					if (flag == 0) {
-						NineManGame.checkTriple(CurrentPlayer, moveToPosition);
+						if (NineManGame.checkTriple(CurrentPlayer, moveToPosition)) {
+							int desiredRemove;
+
+							cout << "Which piece would you like to remove: ";
+							cin >> desiredRemove;
+
+
+							while (!NineManGame.play(0, desiredRemove, 0, 1)) {
+								cout << "Please enter a valid piece: ";
+								cin >> desiredRemove;
+							}
+
+							NineManGame.play(0, desiredRemove, 0, 1);
+						}
 					}
 
 					//display board after move
@@ -258,15 +271,21 @@ int main() {
 				else {
 					cout << "\n--------AI's turn--------" << endl;
 
-					int temp = 0;
-					temp = NineManGame.alphabeta(4, INT_MIN, INT_MAX, true);
-					
-					cout << temp;
+					int moveMade;
+					moveMade = NineManGame.playAI();
+
+					//check if triple was made from the move
+					if (NineManGame.checkTriple(2, moveMade)) {
+						cout << "AI removing a piece..." << endl;
+						NineManGame.playAIRemove();
+					}
+
+					NineManGame.display();
 
 					//switch players only if there is no flag
-					if (flag == 0) {
-						CurrentPlayer = 1;
-					}
+
+					CurrentPlayer = 1;
+	
 				}
 
 			}
@@ -281,8 +300,6 @@ int main() {
 			else {
 				playInput = false;
 			}
-
-			NineManGame.alphabeta(3, 1, 2, true);
 
 			break;
 
