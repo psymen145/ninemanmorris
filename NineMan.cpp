@@ -583,16 +583,14 @@ int NineManMorris::getTokensPlaced(int player) {
 
 int NineManMorris::playAI() {
 
-	vector<Board> allBoards = gameboard.generateBoard(2, phase); //get all the possible boards for the current state (1 depth down);
-	int bestScore = INT_MIN;
-	int currentScore = 0;
 	Board bestBoard;
-	int position;
+	int position = -1;
 
-	alphabeta(gameboard, 3, INT_MIN, INT_MAX, 2, position);
+	alphabeta(gameboard, 4, INT_MIN, INT_MAX, 2, position);
 
 	cout << "This position: " << position << endl;
 	gameboard.setBoard(position, 2);
+	numOfTokensInHandP2 -= 1; //decrease num of tokens in AI hand (main needs to know this to switch phases)
 	return position;
 }
 
@@ -654,6 +652,7 @@ void NineManMorris::playAIRemove() {
 		if (gameboard.getBoard(i) == 1) {
 			//test, just remove first opponent token we see
 			gameboard.setBoard(i, 0);
+			break;
 		}
 	}
 }
