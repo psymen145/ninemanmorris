@@ -1,7 +1,6 @@
 #ifndef NINEMAN_H
 #define NINEMAN_H
 #include "board.h"
-#include "ScoredMove.h"
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -22,14 +21,15 @@ public:
     int getNumTokensP2();	//return the number of tokens in hand of P2
     bool checkTriple(int currentplayer, int spot);	//check if a three in a row
     int getTokensPlaced(int player);	//returns how many tokens are placed on the board by parameter
-    void playAI();
-
+    int playAI();	//returns the position last made by AI
+    void playAIRemove();
+    
 private:
     Board gameboard;
     int phase;  //determines if its placing stage, moving stage or flying stage
     int numOfTokensInHandP1;
     int numOfTokensInHandP2;
-    int alphabeta(Board TreeNode, int depth, int alpha, int beta, int Player);
+    int alphabeta(Board TreeNode, int depth, int alpha, int beta, int Player, int& position);
 };
 
 #endif

@@ -294,11 +294,11 @@ bool NineManMorris::play(int player, int token, int MoveTo, int playType) {
         gameboard.setPositionLastPlaced(MoveTo, player);
     }
     
-    if(playType){    //means we are removing a piece because a mill was formed
-        if(gameboard.getBoard(token) == 0 || gameboard.getBoard(token) == player){
+    if (playType) {    //means we are removing a piece because a mill was formed
+        if (gameboard.getBoard(token) == 0 || gameboard.getBoard(token) == player) {
             return false;
         }
-        else{
+        else {
             gameboard.tokenRemove = 0;  //used for AI to know that it is turn to remove a token or not
             gameboard.setBoard(token, 0);
             return true;
@@ -580,34 +580,21 @@ int NineManMorris::getTokensPlaced(int player) {
     return counter;
 }
 
-void NineManMorris::playAI(){
+int NineManMorris::playAI() {
     
-    vector<Board> allBoards = gameboard.generateBoard(2, phase); //get all the possible boards for the current state (1 depth down);
-    int bestScore = INT_MIN;
-    int currentScore = 0;
     Board bestBoard;
+    int position;
     
-    for(int i = 0; i < allBoards.size(); i++){
-        currentScore = alphabeta(allBoards.at(i), 3, INT_MIN, INT_MAX, 1);
-        if(currentScore > bestScore){
-            bestBoard = allBoards.at(i);
-            bestScore = currentScore;
-        }
-    }
+    alphabeta(gameboard, 6, INT_MIN, INT_MAX, 2, position);
     
-    while(gameboard.tokenRemove == 1){
-        
-        gameboard.tokenRemove = 0;
-    }
-    
-    //need to check if a mill was made in the last move, if there was, we need the AI to choose a piece to remove
-    
-    gameboard = bestBoard;
-    
+    cout << "This position: " << position << endl;
+    gameboard.setBoard(position, 2);
+    numOfTokensInHandP2 -= 1; //decrease num of tokens in AI hand (main needs to know this to switch phases)
+    return position;
 }
 
 //maxPlayer = 2 means the AI, maxPlayer = 1 means the human
-int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, int Player) {
+int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, int Player, int& position) {
     //v will be the value passed up the tree
     int v;
     
@@ -621,7 +608,7 @@ int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, int
         //return the heuristic value of node, this will generate the v value for the bottom node
         return TreeNode.evaluateBoard(Player, phase);
     }
-        
+    
     if (Player == 2) {
         v = INT_MIN;
         
@@ -630,13 +617,17 @@ int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, int
         
         for (int i = 0; i < possibleBoards.size(); i++) {
             //see which child is the best choice
-            v = max(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, 1));
-            alpha = max(alpha, v);
+            v = max(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, 1, position));
+            //alpha = max(alpha, v);
+            if (alpha < v) {
+                alpha = v;
+                position = possibleBoards.at(i).getPosLastPlaced(2);
+            }
             if (beta <= alpha) {
                 break;		//beta cut - off
             }
         }
-        return v;
+        return v;	//goes back up to parent node
     }
     else {
         v = INT_MAX;
@@ -645,12 +636,22 @@ int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, int
         vector<Board> possibleBoards = TreeNode.generateBoard(Player, phase);
         
         for (int i = 0; i < possibleBoards.size(); i++) {
-            v = min(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, 2));
+            v = min(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, 2, position));
             beta = min(beta, v);
             if (beta <= alpha) {
                 break;		//alpha cut - off
             }
         }
         return v;
+    }
+}
+
+void NineManMorris::playAIRemove() {
+    for (int i = 0; i < 24; i++) {
+        if (gameboard.getBoard(i) == 1) {
+            //test, just remove first opponent token we see
+            gameboard.setBoard(i, 0);
+            break;
+        }
     }
 }
