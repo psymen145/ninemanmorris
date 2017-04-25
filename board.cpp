@@ -167,7 +167,23 @@ int Board::evaluateBoard(int Player, int phase) {
 			for (int j = 0; j < allMills.size(); j++) {
 				millToCheck = allMills.at(j);
 				if (gamePositions[millToCheck.at(0)].getPlayerOccupy() == otherPlayer && gamePositions[millToCheck.at(1)].getPlayerOccupy() == otherPlayer) {
-					score += 5;
+					score += 8;
+				}
+			}
+		}
+	}
+
+	//if other player blocks our move
+	allMills.clear();
+	millToCheck.clear();
+
+	for (int i = 0; i < 24; i++) {
+		if (gamePositions[i].getPlayerOccupy() == otherPlayer) {
+			allMills = gamePositions[i].getMills();
+			for (int j = 0; j < allMills.size(); j++) {
+				millToCheck = allMills.at(j);
+				if (gamePositions[millToCheck.at(0)].getPlayerOccupy() == Player && gamePositions[millToCheck.at(1)].getPlayerOccupy() == Player) {
+					score -= 8;
 				}
 			}
 		}
@@ -176,7 +192,6 @@ int Board::evaluateBoard(int Player, int phase) {
 	//if we almost create a mill (one spot is unoccupied)
 	allMills.clear();
 	millToCheck.clear();
-	counter = 0;
 
 	for (int i = 0; i < 24; i++) {
 		if (gamePositions[i].getPlayerOccupy() == Player) {
@@ -184,14 +199,31 @@ int Board::evaluateBoard(int Player, int phase) {
 			for (int j = 0; j < allMills.size(); j++) {
 				millToCheck = allMills.at(j);
 				if (gamePositions[millToCheck.at(0)].getPlayerOccupy() == Player || gamePositions[millToCheck.at(1)].getPlayerOccupy() == Player) {
-					score += 5;
+					score += 7;
+				}
+			}
+		}
+	}
+
+	//if opponent almost creates a mill
+
+	allMills.clear();
+	millToCheck.clear();
+
+	for (int i = 0; i < 24; i++) {
+		if (gamePositions[i].getPlayerOccupy() == otherPlayer) {
+			allMills = gamePositions[i].getMills();
+			for (int j = 0; j < allMills.size(); j++) {
+				millToCheck = allMills.at(j);
+				if (gamePositions[millToCheck.at(0)].getPlayerOccupy() == otherPlayer || gamePositions[millToCheck.at(1)].getPlayerOccupy() == otherPlayer) {
+					score -= 5;
 				}
 			}
 		}
 	}
 
 	//total amount of pieces
-	counter = 0;
+	/*counter = 0;
 	counter2 = 0;
 	for (int i = 0; i < 24; i++) {
 		if (gamePositions[i].getPlayerOccupy() == 1) {
@@ -207,7 +239,7 @@ int Board::evaluateBoard(int Player, int phase) {
 	}
 	else {
 		score += counter;
-	}
+	}*/
 
 	//check if move was blocked
 	/*if(Player == 2){
@@ -249,21 +281,27 @@ int Board::evaluateBoard(int Player, int phase) {
 	}
 	}*/
 
-	//corner moves are better
-
 	//see if its a winning move
+	counter = 0;
+	counter2 = 0;
+
 	if (phase == 3) {
 		counter = 0;
 		for (int i = 0; i < 24; i++) {
-			if (gamePositions[i].getPlayerOccupy() != Player && gamePositions[i].getPlayerOccupy() != 0) {    //if opposing player's total token count is less than 3
+			if (gamePositions[i].getPlayerOccupy() == Player) {    //if player's total token count is less than 3
 				counter++;
 			}
+			else {
+				counter2++;
+			}
 		}
-		if (counter < 3) {
+		if (counter2 < 3) {	//opponent loses
 			score += 500;
 		}
+		else if (counter < 3) {
+			score -= 500;
+		}
 	}
-	counter = 0;
 
 	return score;
 }
@@ -289,8 +327,8 @@ vector<Board> Board::generateBoard(int Player, int phase) {
 	}
 	else if (phase == 2) {	//phase 2
 		for (int i = 0; i < 24; i++) {
+			cout << i << endl;
 			if (gamePositions[i].getPlayerOccupy() == Player) {	//if there is a token on the piece
-				cout << "GOT IN----------------------------" << endl;
 				for (int j = 0; j < gamePositions[i].getAdjacentPositions().size(); j++) { //get the adjacent positions
 					if (gamePositions[gamePositions[i].getAdjacentPositions().at(j)].getPlayerOccupy() == 0) {	//find the board of the adjacent positions
 						Board newBoard(gamePositions, positionLastPlacedP1, positionLastPlacedP2);
@@ -298,6 +336,9 @@ vector<Board> Board::generateBoard(int Player, int phase) {
 						newBoard.setBoard(gamePositions[i].getAdjacentPositions().at(j), Player);	//set the adjacent position to maximizing player
 						newBoard.setPositionLastPlaced(gamePositions[i].getAdjacentPositions().at(j), Player);
 						temp_vec.push_back(newBoard);
+						for (int i = 0; i < temp_vec.size(); i++) {
+							temp_vec.at(i).displayBoard();
+						}
 					}
 				}
 			}

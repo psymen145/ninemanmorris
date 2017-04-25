@@ -598,7 +598,6 @@ int NineManMorris::playAI() {
 int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, int Player, int& position) {
 	//v will be the value passed up the tree
 	int v;
-
 	//check if a player won in the given board node
 	if (isGameOver()) {
 		return TreeNode.evaluateBoard(Player, phase);

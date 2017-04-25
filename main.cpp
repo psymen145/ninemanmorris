@@ -280,7 +280,9 @@ int main() {
 				else {
 					cout << "\n--------AI's turn--------" << endl;
 
-					int moveMade;
+					NineManGame.testfunc();
+
+					/*int moveMade;
 					moveMade = NineManGame.playAI();
 
 					//check if triple was made from the move
@@ -292,7 +294,7 @@ int main() {
 					NineManGame.display();
 
 					//switch players only if there is no flag
-
+					*/
 					CurrentPlayer = 1;
 				}
 

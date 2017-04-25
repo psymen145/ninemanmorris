@@ -24,6 +24,12 @@ public:
 	int playAI();	//returns the position last made by AI
 	void playAIRemove();
 
+	//test function
+	void testfunc() {
+		gameboard.setBoard(0, 2);
+		gameboard.generateBoard(2, 2);
+	}
+
 private:
 	Board gameboard;
 	int phase;  //determines if its placing stage, moving stage or flying stage
