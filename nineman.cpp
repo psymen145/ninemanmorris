@@ -582,22 +582,28 @@ int NineManMorris::getTokensPlaced(int player) {
 
 int NineManMorris::playAI() {
     
-    Board bestBoard;
-    int position;
+    int position = -1;
+    int tokenLasPos = -1;
     
-    alphabeta(gameboard, 6, INT_MIN, INT_MAX, 2, position);
+    alphabeta(gameboard, 4, INT_MIN, INT_MAX, 2, position, tokenLasPos);
     
-    cout << "This position: " << position << endl;
-    gameboard.setBoard(position, 2);
-    numOfTokensInHandP2 -= 1; //decrease num of tokens in AI hand (main needs to know this to switch phases)
+    
+    if(phase == 1 ){
+        gameboard.setBoard(position, 2);
+        numOfTokensInHandP2 -= 1; //decrease num of tokens in AI hand (main needs to know this to switch phases)
+    }
+    else if(phase == 2 || phase == 3){
+        //for this phase, just copy the gameboard from the bestBoard, couldn't get back position from where token was removed
+        gameboard.setBoard(tokenLasPos, 0);
+    }
+    
     return position;
 }
 
 //maxPlayer = 2 means the AI, maxPlayer = 1 means the human
-int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, int Player, int& position) {
+int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, int Player, int& position, int& tokenLastPosition) {
     //v will be the value passed up the tree
     int v;
-    
     //check if a player won in the given board node
     if (isGameOver()) {
         return TreeNode.evaluateBoard(Player, phase);
@@ -617,11 +623,12 @@ int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, int
         
         for (int i = 0; i < possibleBoards.size(); i++) {
             //see which child is the best choice
-            v = max(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, 1, position));
+            v = max(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, 1, position, tokenLastPosition));
             //alpha = max(alpha, v);
             if (alpha < v) {
                 alpha = v;
                 position = possibleBoards.at(i).getPosLastPlaced(2);
+                tokenLastPosition = possibleBoards.at(i).tokenLastPos;
             }
             if (beta <= alpha) {
                 break;		//beta cut - off
@@ -636,7 +643,7 @@ int NineManMorris::alphabeta(Board TreeNode, int depth, int alpha, int beta, int
         vector<Board> possibleBoards = TreeNode.generateBoard(Player, phase);
         
         for (int i = 0; i < possibleBoards.size(); i++) {
-            v = min(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, 2, position));
+            v = min(v, alphabeta(possibleBoards.at(i), depth - 1, alpha, beta, 2, position, tokenLastPosition));
             beta = min(beta, v);
             if (beta <= alpha) {
                 break;		//alpha cut - off

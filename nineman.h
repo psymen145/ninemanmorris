@@ -24,12 +24,30 @@ public:
     int playAI();	//returns the position last made by AI
     void playAIRemove();
     
+    //test function
+    void testfunc() {
+        gameboard.setBoard(23, 2);
+        gameboard.setBoard(2, 1);
+        gameboard.setBoard(0, 2);
+        gameboard.setBoard(1,1);
+        Board bestBoard;
+        int position;
+        int position2;
+        phase = 2;
+        alphabeta(gameboard, 4, INT_MIN, INT_MAX, 2, position, position2);
+        
+        cout << "POSITION PLACED: " << position << endl;
+        
+        gameboard = bestBoard;
+        bestBoard.displayBoard();
+    }
+    
 private:
     Board gameboard;
     int phase;  //determines if its placing stage, moving stage or flying stage
     int numOfTokensInHandP1;
     int numOfTokensInHandP2;
-    int alphabeta(Board TreeNode, int depth, int alpha, int beta, int Player, int& position);
+    int alphabeta(Board TreeNode, int depth, int alpha, int beta, int Player, int& position, int& tokenToBeMoved);
 };
 
 #endif
