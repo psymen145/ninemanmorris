@@ -111,7 +111,7 @@ void Board::displayBoard() {
 }
 
 int Board::evaluateBoard(int Player, int phase) {
-	int flag = 0; //flag = 1 means token placement allowed one mill to be made, flag = 2 means move made two mills possible
+
 	int counter = 0; //counts to see if all adjacent pieces to a token are blocked, also used for another evaluation to see if current player has more pieces
 	int counter2 = 0;
 	int score = 0;
@@ -124,9 +124,6 @@ int Board::evaluateBoard(int Player, int phase) {
 	else {
 		otherPlayer = 1;
 	}
-
-	int millcounterP2 = 0;
-	int millcounterP1 = 0;
 
 	//check if amount of mills by player
 	vector<vector<int>> allMills;    //mills that can be formed for that position
@@ -183,7 +180,7 @@ int Board::evaluateBoard(int Player, int phase) {
 			for (int j = 0; j < allMills.size(); j++) {
 				millToCheck = allMills.at(j);
 				if (gamePositions[millToCheck.at(0)].getPlayerOccupy() == Player && gamePositions[millToCheck.at(1)].getPlayerOccupy() == Player) {
-					score -= 8;
+					score -= 6;
 				}
 			}
 		}
@@ -199,7 +196,7 @@ int Board::evaluateBoard(int Player, int phase) {
 			for (int j = 0; j < allMills.size(); j++) {
 				millToCheck = allMills.at(j);
 				if (gamePositions[millToCheck.at(0)].getPlayerOccupy() == Player || gamePositions[millToCheck.at(1)].getPlayerOccupy() == Player) {
-					score += 7;
+					score += 6;
 				}
 			}
 		}
@@ -221,25 +218,6 @@ int Board::evaluateBoard(int Player, int phase) {
 			}
 		}
 	}
-
-	//total amount of pieces
-	/*counter = 0;
-	counter2 = 0;
-	for (int i = 0; i < 24; i++) {
-		if (gamePositions[i].getPlayerOccupy() == 1) {
-			counter++;
-		}
-		else if (gamePositions[i].getPlayerOccupy() == 2) {
-			counter2++;
-		}
-	}
-
-	if (Player == 2) {
-		score += counter2;
-	}
-	else {
-		score += counter;
-	}*/
 
 	//check if move was blocked
 	/*if(Player == 2){
@@ -327,18 +305,15 @@ vector<Board> Board::generateBoard(int Player, int phase) {
 	}
 	else if (phase == 2) {	//phase 2
 		for (int i = 0; i < 24; i++) {
-			cout << i << endl;
 			if (gamePositions[i].getPlayerOccupy() == Player) {	//if there is a token on the piece
 				for (int j = 0; j < gamePositions[i].getAdjacentPositions().size(); j++) { //get the adjacent positions
 					if (gamePositions[gamePositions[i].getAdjacentPositions().at(j)].getPlayerOccupy() == 0) {	//find the board of the adjacent positions
 						Board newBoard(gamePositions, positionLastPlacedP1, positionLastPlacedP2);
+						newBoard.tokenLastPos = i;   //so we can refer back to where token was originally placed
 						newBoard.setBoard(i, 0);	//set the position of the desired token that we want to move, to 0
 						newBoard.setBoard(gamePositions[i].getAdjacentPositions().at(j), Player);	//set the adjacent position to maximizing player
 						newBoard.setPositionLastPlaced(gamePositions[i].getAdjacentPositions().at(j), Player);
 						temp_vec.push_back(newBoard);
-						for (int i = 0; i < temp_vec.size(); i++) {
-							temp_vec.at(i).displayBoard();
-						}
 					}
 				}
 			}
@@ -351,6 +326,7 @@ vector<Board> Board::generateBoard(int Player, int phase) {
 				for (int j = 0; j < 24; j++) {	//for each spot that is empty, you can generate a board for it
 					if (gamePositions[j].getPlayerOccupy() == 0) {
 						Board newBoard(gamePositions, positionLastPlacedP1, positionLastPlacedP2);
+						newBoard.tokenLastPos = i;
 						newBoard.setBoard(i, 0);
 						newBoard.setBoard(j, Player);
 						newBoard.setPositionLastPlaced(j, Player);

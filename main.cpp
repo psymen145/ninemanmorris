@@ -48,19 +48,20 @@ int main() {
 			//while the game is not over, keep playing
 			while (!NineManGame.isGameOver()) {
 				if (NineManGame.getPhase() == 1) {
+
+					//tell player how many tokens they have left in hand
+					if (CurrentPlayer == 1) {
+						cout << "\nPlayer " << CurrentPlayer << " you have " << NineManGame.getNumTokensP1() << " tokens in your hand" << endl;
+					}
+					else {
+						cout << "\nPlayer " << CurrentPlayer << " you have " << NineManGame.getNumTokensP2() << " tokens in your hand" << endl;
+					}
+
 					cout << "[Phase 1]: Player " << CurrentPlayer << " which position would you want to place your token: ";
 					cin >> moveToPosition;
 
 					if (NineManGame.isValid(CurrentPlayer, token, moveToPosition)) {
 						NineManGame.play(CurrentPlayer, -1, moveToPosition, 0);
-
-						//tell player how many tokens they have left in hand
-						if (CurrentPlayer == 1) {
-							cout << "\nPlayer " << CurrentPlayer << " you have " << NineManGame.getNumTokensP1() << " tokens remaining in your hand\n" << endl;
-						}
-						else {
-							cout << "\nPlayer " << CurrentPlayer << " you have " << NineManGame.getNumTokensP2() << " tokens remaining in your hand\n" << endl;
-						}
 
 					}
 					else {
@@ -101,7 +102,7 @@ int main() {
 					if (NineManGame.checkTriple(CurrentPlayer, moveToPosition)) { //if a triple was formed
 						int desiredRemove;
 
-						cout << "Player " << CurrentPlayer << " please remove an opponent's token: " << endl;
+						cout << "[REMOVAL PHASE] Player " << CurrentPlayer << " please remove an opponent's token: " << endl;
 						cin >> desiredRemove;
 
 						//check if desired token to remove is a valid move
@@ -183,19 +184,16 @@ int main() {
 			while (!NineManGame.isGameOver()) {     //keep playing if game isn't over
 				if (CurrentPlayer == 1) {
 					if (NineManGame.getPhase() == 1) {
-						cout << "[Phase 1]: Player which position would you want to place your token: ";
+
+						//tell player how many tokens they have left in hand
+						cout << "Human you have " << NineManGame.getNumTokensP1() << " tokens in your hand" << endl;
+
+
+						cout << "[Phase 1]: Human which position would you want to place your token: ";
 						cin >> moveToPosition;
 
 						if (NineManGame.isValid(CurrentPlayer, token, moveToPosition)) {
 							NineManGame.play(CurrentPlayer, -1, moveToPosition, 0);
-
-							//tell player how many tokens they have left in hand
-							if (CurrentPlayer == 1) {
-								cout << "\nPlayer " << CurrentPlayer << " you have " << NineManGame.getNumTokensP1() << " tokens remaining in your hand\n" << endl;
-							}
-							else {
-								cout << "\nPlayer " << CurrentPlayer << " you have " << NineManGame.getNumTokensP2() << " tokens remaining in your hand\n" << endl;
-							}
 
 						}
 						else {
@@ -204,7 +202,7 @@ int main() {
 						}
 					}
 					else if (NineManGame.getPhase() == 2) {	//check if phase 2
-						cout << "[Phase 2]: Player " << CurrentPlayer << " which token would you like to move: ";
+						cout << "[Phase 2]: Human which token would you like to move: ";
 						cin >> token;
 						cout << endl << "Where would you like to move the token: ";
 						cin >> moveToPosition;
@@ -218,7 +216,7 @@ int main() {
 						}
 					}
 					else if (NineManGame.getPhase() == 3) {	//check if phase 3
-						cout << "[Phase 3]: Player " << CurrentPlayer << " which token would you like to move: ";
+						cout << "[Phase 3]: Human which token would you like to move: ";
 						cin >> token;
 						cout << endl << "Where would you like to move the token: ";
 						cin >> moveToPosition;
@@ -234,9 +232,11 @@ int main() {
 					//check if there is a triple only if move was valid (indicated by flag still being 0)
 					if (flag == 0) {
 						if (NineManGame.checkTriple(CurrentPlayer, moveToPosition)) { //if a triple was formed
+
+							NineManGame.display();
 							int desiredRemove;
 
-							cout << "Player " << CurrentPlayer << " please remove an opponent's token: " << endl;
+							cout << "[REMOVAL PHASE] Human please remove an opponent's token: " << endl;
 							cin >> desiredRemove;
 
 							//check if desired token to remove is a valid move
@@ -278,24 +278,44 @@ int main() {
 
 				}
 				else {
-					cout << "\n--------AI's turn--------" << endl;
+					cout << "\n-----------------AI's turn----------------\n" << endl;
 
-					NineManGame.testfunc();
+					//NineManGame.testfunc();
 
-					/*int moveMade;
+					int moveMade;
 					moveMade = NineManGame.playAI();
+
+					cout << "AI made move at " << moveMade << endl;
 
 					//check if triple was made from the move
 					if (NineManGame.checkTriple(2, moveMade)) {
-						cout << "AI removing a piece..." << endl;
+						cout << "[REMOVAL PHASE] AI removing a piece..." << endl;
 						NineManGame.playAIRemove();
 					}
 
 					NineManGame.display();
 
-					//switch players only if there is no flag
-					*/
+					//switch players
+
 					CurrentPlayer = 1;
+
+					//check if it is time to switch phases
+					//changes to phase 2
+					//also have to make sure that we don't keep changing back to phase 2 after we changed to phase 3
+					if (NineManGame.getNumTokensP1() == 0 && NineManGame.getNumTokensP2() == 0 && NineManGame.getPhase() == 1) {
+						cout << "------------------------------------------\n\t\tPHASE 2\n------------------------------------------\n" << endl;
+						NineManGame.setPhase(2);
+					}
+
+					//changes to phase 3 if a player has 3 or less pieces
+					if (NineManGame.getTokensPlaced(CurrentPlayer) <= 3 && NineManGame.getPhase() == 2) {
+						cout << "------------------------------------------\n\t\tPHASE 3\n------------------------------------------\n" << endl;
+						NineManGame.setPhase(3);
+					}
+					else if (NineManGame.getTokensPlaced(CurrentPlayer) > 3 && NineManGame.getPhase() == 3) {
+						cout << "------------------------------------------\n\t\tPHASE 2\n------------------------------------------\n" << endl;
+						NineManGame.setPhase(2);
+					}
 				}
 
 			}

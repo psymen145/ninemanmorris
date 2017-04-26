@@ -22,6 +22,7 @@ public:
 	int getPosLastPlaced(int player);
 	void setPositionLastPlaced(int position, int player);
 	int tokenRemove;    //used we would know if token is going to be removed for mill
+	int tokenLastPos;   //used for phase 2 or 3, so AI knows where the token was last placed
 
 private:
 
