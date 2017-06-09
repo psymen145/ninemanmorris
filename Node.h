@@ -14,7 +14,7 @@ public:
 	vector<int> getAdjacentPositions();
 
 private:
-	int playerOccupy;
+	int playerOccupy;	//used to get determine if board is empty
 	vector<vector<int>> possibleMills;
 	vector<int> adjacentPositions;
 };
